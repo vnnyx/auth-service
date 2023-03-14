@@ -1,0 +1,23 @@
+syntax = "proto3";
+package pb.auth;
+
+option go_package = "pb/auth";
+
+message User{
+    string id = 1;
+    string username = 2;
+}
+
+message AuthRequest{
+    User user = 1;
+    string username = 2;
+    string password = 3;
+}
+
+message Token{
+    string access_token = 1;
+}
+
+service AuthService{
+    rpc Login(AuthRequest) returns (Token) {}
+}
