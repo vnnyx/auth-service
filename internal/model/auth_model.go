@@ -29,6 +29,12 @@ type User struct {
 	Username string
 }
 
+type DecodedStructure struct {
+	UserID     string
+	Username   string
+	AccessUUID string
+}
+
 func (l LoginResponse) ToGRPCResponse() *pb.Token {
 	return &pb.Token{
 		AccessToken: l.AccessToken,

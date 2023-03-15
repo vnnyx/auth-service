@@ -11,12 +11,12 @@ import (
 	"github.com/vnnyx/auth-service/internal/usecase"
 )
 
-func InitializeGRPCAAuthServer() *grpc.Server {
+func InitializeGRPCAuthServer() *grpc.Server {
 	wire.Build(
 		infrastructure.NewRedisClient,
 		repository.NewAuthRepository,
 		usecase.NewAuthUC,
-		grpc.NewGRPCServer,
+		grpc.NewAuthServiceServer,
 	)
 	return nil
 }

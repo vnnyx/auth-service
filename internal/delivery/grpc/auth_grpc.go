@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/vnnyx/auth-service/internal/model"
 	"github.com/vnnyx/auth-service/internal/usecase"
 	pb "github.com/vnnyx/auth-service/pb/auth"
@@ -13,7 +14,7 @@ type Server struct {
 	pb.UnimplementedAuthServiceServer
 }
 
-func NewGRPCServer(authUC usecase.AuthUC) *Server {
+func NewAuthServiceServer(authUC usecase.AuthUC) *Server {
 	return &Server{authUC: authUC}
 }
 
@@ -23,4 +24,14 @@ func (s *Server) Login(ctx context.Context, req *pb.AuthRequest) (*pb.Token, err
 		return nil, err
 	}
 	return res.ToGRPCResponse(), nil
+}
+
+func (s *Server) Logout(ctx context.Context, req *pb.Token) (*wrappers.BoolValue, error) {
+	got, err := s.authUC.Logout(ctx, req.AccessToken)
+	return &wrappers.BoolValue{Value: got}, err
+}
+
+func (s *Server) HasAccess(ctx context.Context, req *pb.Token) (*wrappers.BoolValue, error) {
+	got, err := s.authUC.Logout(ctx, req.AccessToken)
+	return &wrappers.BoolValue{Value: got}, err
 }

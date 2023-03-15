@@ -8,6 +8,7 @@ package auth
 
 import (
 	context "context"
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -23,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	Login(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*Token, error)
+	Logout(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrappers.BoolValue, error)
+	HasAccess(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrappers.BoolValue, error)
 }
 
 type authServiceClient struct {
@@ -42,11 +45,31 @@ func (c *authServiceClient) Login(ctx context.Context, in *AuthRequest, opts ...
 	return out, nil
 }
 
+func (c *authServiceClient) Logout(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrappers.BoolValue, error) {
+	out := new(wrappers.BoolValue)
+	err := c.cc.Invoke(ctx, "/pb.auth.AuthService/Logout", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) HasAccess(ctx context.Context, in *Token, opts ...grpc.CallOption) (*wrappers.BoolValue, error) {
+	out := new(wrappers.BoolValue)
+	err := c.cc.Invoke(ctx, "/pb.auth.AuthService/HasAccess", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
 type AuthServiceServer interface {
 	Login(context.Context, *AuthRequest) (*Token, error)
+	Logout(context.Context, *Token) (*wrappers.BoolValue, error)
+	HasAccess(context.Context, *Token) (*wrappers.BoolValue, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -56,6 +79,12 @@ type UnimplementedAuthServiceServer struct {
 
 func (UnimplementedAuthServiceServer) Login(context.Context, *AuthRequest) (*Token, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAuthServiceServer) Logout(context.Context, *Token) (*wrappers.BoolValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedAuthServiceServer) HasAccess(context.Context, *Token) (*wrappers.BoolValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HasAccess not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -88,6 +117,42 @@ func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.auth.AuthService/Logout",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).Logout(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_HasAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).HasAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.auth.AuthService/HasAccess",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).HasAccess(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +163,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AuthService_Login_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _AuthService_Logout_Handler,
+		},
+		{
+			MethodName: "HasAccess",
+			Handler:    _AuthService_HasAccess_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
