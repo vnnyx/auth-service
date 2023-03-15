@@ -32,6 +32,6 @@ func (s *Server) Logout(ctx context.Context, req *pb.Token) (*wrappers.BoolValue
 }
 
 func (s *Server) HasAccess(ctx context.Context, req *pb.Token) (*wrappers.BoolValue, error) {
-	got, err := s.authUC.Logout(ctx, req.AccessToken)
+	got, err := s.authUC.HasAccess(ctx, req.AccessToken)
 	return &wrappers.BoolValue{Value: got}, err
 }
