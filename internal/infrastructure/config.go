@@ -9,6 +9,7 @@ type Config struct {
 	PrivateKey      string `mapstructure:"JWT_PRIVATE_KEY"`
 	PublicKey       string `mapstructure:"JWT_PUBLIC_KEY"`
 	ServiceAuthPort string `mapstructure:"SERVICE_AUTH_PORT"`
+	JWTMinutes      int64  `mapstructure:"JWT_MINUTES"`
 }
 
 func NewConfig() *Config {

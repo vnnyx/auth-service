@@ -15,10 +15,10 @@ import (
 
 // Injectors from injector.go:
 
-func InitializeGRPCAAuthServer() *grpc.Server {
+func InitializeGRPCAuthServer() *grpc.Server {
 	client := infrastructure.NewRedisClient()
 	authRepository := repository.NewAuthRepository(client)
 	authUC := usecase.NewAuthUC(authRepository)
-	server := grpc.NewGRPCServer(authUC)
+	server := grpc.NewAuthServiceServer(authUC)
 	return server
 }

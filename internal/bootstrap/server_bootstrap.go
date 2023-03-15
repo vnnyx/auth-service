@@ -12,7 +12,7 @@ import (
 
 func StartServer() {
 	cfg := infrastructure.NewConfig()
-	grpcDelivery := di.InitializeGRPCAAuthServer()
+	grpcDelivery := di.InitializeGRPCAuthServer()
 	srv := grpc.NewServer()
 	pb.RegisterAuthServiceServer(srv, grpcDelivery)
 

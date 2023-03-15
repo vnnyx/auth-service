@@ -9,23 +9,25 @@ import (
 	"github.com/vnnyx/auth-service/internal/model"
 )
 
-func CreateToken(user model.User) (td *model.TokenDetails, err error) {
+func CreateToken(user model.User) (*model.TokenDetails, error) {
 	cfg := infrastructure.NewConfig()
 
-	expired := time.Now().Add(10 * time.Minute)
+	access_uuid := uuid.NewString()
+	expired := time.Now().Add(time.Minute * time.Duration(cfg.JWTMinutes))
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = expired
 	claims["authorized"] = true
 	claims["user"] = user.Username
-	claims["id"] = user.ID
+	claims["user_id"] = user.ID
+	claims["access_uuid"] = access_uuid
 	tokenString, err := token.SignedString([]byte(cfg.PrivateKey))
 	if err != nil {
-		return td, err
+		return nil, err
 	}
-
-	td.AccessToken = tokenString
-	td.AccessUUID = uuid.New().String()
-	td.AtExpires = expired.Unix()
-	return td, nil
+	return &model.TokenDetails{
+		AccessToken: tokenString,
+		AccessUUID:  access_uuid,
+		AtExpires:   expired.Unix(),
+	}, nil
 }

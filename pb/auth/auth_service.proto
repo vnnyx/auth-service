@@ -3,6 +3,8 @@ package pb.auth;
 
 option go_package = "pb/auth";
 
+import "google/protobuf/wrappers.proto";
+
 message User{
     string id = 1;
     string username = 2;
@@ -20,4 +22,6 @@ message Token{
 
 service AuthService{
     rpc Login(AuthRequest) returns (Token) {}
+    rpc Logout(Token) returns (google.protobuf.BoolValue) {}
+    rpc HasAccess(Token) returns (google.protobuf.BoolValue) {}
 }
